@@ -4,8 +4,6 @@
 
 # define VERSION "1.0.0"
 
-/************************************* FuncResult */
-
 // 错误码枚举
 typedef enum {
     SUCCESS = 0, 
@@ -14,6 +12,8 @@ typedef enum {
     INVALID_ARGUMENT, // 参数错误
     // ...
 } ErrCode;
+
+/** FuncResult ------------------------------------------------------------- */
 
 // 函数返回值
 typedef struct {
@@ -106,7 +106,7 @@ void FuncResult_Free(FuncResult** p_self){
     *p_self = NULL;
 }
 
-/************************************* FuncResult */
+/** FuncResult ------------------------------------------------------------- */
 
 /**
  * 解析参数
