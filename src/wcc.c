@@ -119,8 +119,8 @@ FuncResult* analysis(int argc, char** argv){
 
 void help(){
     puts("usage:");
-    puts("\t wcc [source]               complie source");
-    puts("\t wcc [source] -o [target]   complie source to target");
+    puts("\t wcc -s [source]               complie source");
+    puts("\t wcc -s [source] -o [target]   complie source to target");
     puts("\t wcc -h                     help");
     puts("\t wcc -v                     version");
     printf("press any key to continue ...");
@@ -139,13 +139,24 @@ void init(){
 int main(int argc, char** argv){
     init();
 
-    if(argc <= 1){
-        help();
-        return 0;
-    }    
-
     // 解析参数
-    FuncResult_Free(NULL);
+    char* source_file = NULL; // 源码文件
+    char* target_file = "a.exe"; // 目标文件
+    if(argc == 2 && strcmp("-v", argv[1]) == 0){ 
+        // -v
+        puts(VERSION);
+    } else if (argc == 3 && strcmp("-s", argv[1]) == 0){
+        // -s [source]
+        source_file = argv[2];
+    } else if (argc == 5 && strcmp("-s", argv[1]) == 0 && strcmp("-o", argv[3]) == 0){
+        // -s [source] -o [target] 
+        source_file = argv[2];
+        target_file = argv[4];
+    } else {
+        help();
+    }
+    puts(source_file);
+    puts(target_file);
 
 
     return 0;
