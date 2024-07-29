@@ -2,7 +2,9 @@
 # include <string.h>
 # include <stdlib.h>
 
+# define COMPLIER_NAME "wcc"
 # define VERSION "1.0.0"
+
 
 // 错误码枚举
 typedef enum {
@@ -27,7 +29,7 @@ typedef struct {
 /**
  * 创建一个结构体, 只负责简单的赋值
  */
-FuncResult* FuncResult_New(
+FuncResult* FuncResult_new(
     char success, 
     ErrCode err_code, 
     char* msg,
@@ -50,7 +52,7 @@ FuncResult* FuncResult_New(
  * @param msg 错误信息
  * @return 生成的返回信息,使用完成后需要使用 FuncResult_Free 函数回收内存
  */
-FuncResult* FuncResult_Err(ErrCode err_code, const char* msg){
+FuncResult* FuncResult_err(ErrCode err_code, const char* msg){
     char* msg_copy = NULL;
     if(msg != NULL){
         int msg_len = strlen(msg);
@@ -63,7 +65,7 @@ FuncResult* FuncResult_Err(ErrCode err_code, const char* msg){
         strncpy(msg_copy, msg, msg_len + 1);
     }
 
-    return FuncResult_New(0, err_code, msg_copy, NULL, 0);
+    return FuncResult_new(0, err_code, msg_copy, NULL, 0);
 }
 
 /**
@@ -72,7 +74,7 @@ FuncResult* FuncResult_Err(ErrCode err_code, const char* msg){
  * @param data_size data 所占大小
  * @return 生成的返回信息,使用完成后需要使用 FuncResult_Free 函数回收内存
  */
-FuncResult* FuncResult_Success(void* data, int data_size){
+FuncResult* FuncResult_success(void* data, int data_size){
     char* data_copy = NULL;
     if(data != NULL && data_size > 0){
         char* data_copy = (char*)malloc(data_size);
@@ -83,14 +85,14 @@ FuncResult* FuncResult_Success(void* data, int data_size){
         memcpy(data_copy, data, data_size);
     }
 
-    return FuncResult_New(1, SUCCESS, NULL, data_copy, data_size);
+    return FuncResult_new(1, SUCCESS, NULL, data_copy, data_size);
 }
 
 /**
  * 对 FuncResult 进行内存回收, 包括 msg, data;
  * @param p_self 传入的 FuncResult 指针的地址, 回收成功后会把 FuncResult 指针设置为 NULL
  */
-void FuncResult_Free(FuncResult** p_self){
+void FuncResult_free(FuncResult** p_self){
     if(p_self == NULL || *p_self == NULL){
         printf("[error] FuncResult_Free(NULL)\n");
         exit(1);
@@ -108,21 +110,26 @@ void FuncResult_Free(FuncResult** p_self){
 
 /** FuncResult ------------------------------------------------------------- */
 
-/**
- * 解析参数
- * 
- */
-FuncResult* analysis(int argc, char** argv){
+typedef struct {
+    char s_state; // -s
+    char* source_file; // 源文件
 
-}
+    char o_state; // -o
+    char* target_file; // 目标文件
+
+    char d_state; // -d
+    char v_state; // -v
+} InputArg;
 
 
 void help(){
-    puts("usage:");
-    puts("\t wcc -s [source]               complie source");
-    puts("\t wcc -s [source] -o [target]   complie source to target");
-    puts("\t wcc -h                     help");
-    puts("\t wcc -v                     version");
+    printf("usage: %s [-arg1 param1] [-arg2 param2] ...\n", COMPLIER_NAME);
+    printf("paramter: \n");
+    printf("\t -s [source]   complie source\n", COMPLIER_NAME);
+    printf("\t -o [target]   complie source to target\n", COMPLIER_NAME);
+    printf("\t --h           help\n", COMPLIER_NAME);
+    printf("\t --v           version\n", COMPLIER_NAME);
+    printf("\t --d           enable debug\n");
     printf("press any key to continue ...");
     getchar();
 }
@@ -135,29 +142,34 @@ void init(){
     
 }
 
+void anaysis(){
+
+}
+
 
 int main(int argc, char** argv){
     init();
 
     // 解析参数
-    char* source_file = NULL; // 源码文件
-    char* target_file = "a.exe"; // 目标文件
+    InputArg input_arg = {0, NULL, 0, "out.exe"};
     if(argc == 2 && strcmp("-v", argv[1]) == 0){ 
         // -v
         puts(VERSION);
     } else if (argc == 3 && strcmp("-s", argv[1]) == 0){
         // -s [source]
-        source_file = argv[2];
+        input_arg.source_file = argv[2];
     } else if (argc == 5 && strcmp("-s", argv[1]) == 0 && strcmp("-o", argv[3]) == 0){
         // -s [source] -o [target] 
-        source_file = argv[2];
-        target_file = argv[4];
+        input_arg.source_file = argv[2];
+        input_arg.target_file = argv[4];
     } else {
         help();
     }
-    puts(source_file);
-    puts(target_file);
 
+    if(input_arg.d_state != 0){
+        puts(input_arg.source_file);
+        puts(input_arg.target_file);
+    }
 
     return 0;
 }
