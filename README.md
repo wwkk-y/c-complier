@@ -18,13 +18,13 @@ typedef struct PersonComputer {
 } PersonComputer;
 ```
 
-- 函数: 下划线分割单词, 为了与变量区分, 大写开头, 例如 `New_Node`, `Delete_All`
+- 函数: 下划线分割单词, 为了与变量区分, 第一个单词小写开头, 后续单词大写开头, 例如 `new_Node`, `delete_All`
     - 特殊情况: 对于某个结构体的专用函数, 使用 `结构体名 + 函数` 命名, 例如:
 
 ```c
-LinkList* LinkList_New();
-LinkList* LinkList_Insert(int val);
-void LinkList_Free(LinkList** p_self);
+LinkList* LinkList_new();
+LinkList* LinkList_insert(int val);
+void LinkList_free(LinkList** p_self);
 ```
 
 ### 注释规范
@@ -37,7 +37,7 @@ void LinkList_Free(LinkList** p_self);
  * @param arg1 说明参数 arg1 的含义
  * @return 说明返回值
  */
-int Some_Func(int arg1){
+int some_Func(int arg1){
     // ...
 }
 ```
@@ -88,7 +88,7 @@ typedef enum {
  * @param msg 错误信息
  * @return 生成的返回信息,使用完成后需要使用 FuncResult_Free 函数回收内存
  */
-FuncResult* FuncResult_Err(ErrCode err_code, const char* msg);
+FuncResult* FuncResult_err(ErrCode err_code, const char* msg);
 
 /**
  * 生成一个正确信息
@@ -96,47 +96,47 @@ FuncResult* FuncResult_Err(ErrCode err_code, const char* msg);
  * @param data_size data 所占大小
  * @return 生成的返回信息,使用完成后需要使用 FuncResult_Free 函数回收内存
  */
-FuncResult* FuncResult_Success(void* data, int data_size);
+FuncResult* FuncResult_success(void* data, int data_size);
 
 /**
  * 对 FuncResult 进行内存回收, 包括 msg, data;
  * @param p_self 传入的 FuncResult 指针的地址, 回收成功后会把 FuncResult 指针设置为 NULL
  */
-void FuncResult_Free(FuncResult** p_self);
+void FuncResult_free(FuncResult** p_self);
 ```
 
 - 定义函数时可以这么写
 
 ``` c
-FuncResult* Some_Func(){
+FuncResult* Some_func(){
     // ...
     if(...){ // ... 如果发生了某些错误
-        return FuncResult_Err(NULL_POINTER, "空指针异常");
+        return FuncResult_err(NULL_POINTER, "空指针异常");
     }
     int result = 1; // 返回值
     // ... 业务处理
-    return FuncResult_Success(&result, sizeof(result));
+    return FuncResult_success(&result, sizeof(result));
 }
 ```
 
 - 调用函数完成后进行错误处理
 
 ```c
-FuncResult* result = Some_Func();
+FuncResult* result = some_Func();
 if(!(result->success)){
     // ... 错误处理
 }
 int* data = (int*)(result->data);
 // ... 业务处理
 // 回收
-FuncResult_Free(&result);
+FuncResult_free(&result);
 ```
 
 #### 总结
 
 使用这样的错误处理方式有一定的问题:
 
-- 增加内存管理的负担, 每次使用完 `FuncResult` 都需要手动调用 `FuncResult_Free` 释放。
+- 增加内存管理的负担, 每次使用完 `FuncResult` 都需要手动调用 `FuncResult_free` 释放。
 - 为了兼容不同类型, 我把 `data` 设置成了一个 `void` 指针, 使用时需要进行类型转换, 容易引入类型不安全的问题。
 
 但是我认为它的优点是大于缺点的:
